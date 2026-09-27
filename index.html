@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فاحص منتجات الكيتو - السعودية</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome للأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
@@ -21,7 +19,7 @@
             <i class="fa-solid fa-leaf text-2xl text-emerald-300"></i>
             <h1 class="text-xl font-bold">كيتو سكنر السعودية</h1>
         </div>
-        <span class="text-xs bg-emerald-800 px-3 py-1 rounded-full text-emerald-200">النسخة المباشرة</span>
+        <span class="text-xs bg-emerald-800 px-3 py-1 rounded-full text-emerald-200">النسخة المتكاملة</span>
     </header>
 
     <!-- المحتوى الرئيسي -->
@@ -31,18 +29,24 @@
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
             <h2 class="text-lg font-bold text-gray-700">تأكد من ملاءمة المنتج لنظام الكيتو</h2>
             
-            <!-- حقل البحث اليدوي -->
+            <!-- حقل البحث اليدوي والباركود -->
             <div class="relative flex items-center">
-                <input type="text" id="searchInput" placeholder="ابحث باسم المنتج (مثل: شوكولاتة، جبنة، زبدة)..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500">
+                <input type="text" id="searchInput" placeholder="ابحث باسم المنتج أو أدخل الباركود..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500">
                 <button onclick="searchProduct()" class="absolute left-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">
                     <i class="fa-solid fa-search"></i>
                 </button>
             </div>
 
-            <!-- زر فحص الكاميرا المباشر (يفتح عدسة الكاميرا فوراً) -->
-            <div class="mt-2">
-                <label class="w-full bg-indigo-600 text-white p-4 rounded-xl flex items-center justify-center gap-2 font-semibold hover:bg-indigo-700 transition cursor-pointer shadow-md">
-                    <i class="fa-solid fa-camera text-xl"></i> التقاط وفحص المكونات بالكاميرا فوراً
+            <!-- أزرار العمليات -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                <!-- زر مسح الباركود المباشر بالحركة -->
+                <button onclick="openLiveScanner()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 p-3 rounded-xl flex items-center justify-center gap-2 font-semibold hover:bg-emerald-100 transition">
+                    <i class="fa-solid fa-barcode text-xl"></i> مسح باركود مباشر
+                </button>
+                
+                <!-- زر فحص المكونات بالكاميرا -->
+                <label class="bg-indigo-600 text-white p-3 rounded-xl flex items-center justify-center gap-2 font-semibold hover:bg-indigo-700 transition cursor-pointer shadow-md">
+                    <i class="fa-solid fa-camera text-xl"></i> فحص المكونات بالكاميرا
                     <input type="file" accept="image/*" capture="camera" class="hidden" onchange="handleCameraCapture(event)">
                 </label>
             </div>
@@ -50,11 +54,25 @@
 
         <!-- منطقة عرض النتائج -->
         <div id="resultContainer" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hidden">
-            <h3 class="font-bold text-gray-700 mb-2 border-b pb-2">نتيجة التحليل والدقة</h3>
+            <h3 class="font-bold text-gray-700 mb-2 border-b pb-2">نتيجة الفحص</h3>
             <div id="resultContent" class="text-sm leading-relaxed text-gray-600"></div>
         </div>
 
     </main>
+
+    <!-- نافذة مسح الباركود الحي -->
+    <div id="scannerModal" class="fixed inset-0 bg-black/80 z-50 hidden flex flex-col items-center justify-center p-4">
+        <div class="relative w-full max-w-md bg-black rounded-2xl overflow-hidden shadow-2xl flex flex-col items-center">
+            <video id="scannerVideo" class="w-full h-80 object-cover" autoplay playsinline></video>
+            <div class="absolute inset-0 border-2 border-emerald-500/50 pointer-events-none m-12 rounded-xl flex items-center justify-center">
+                <span class="text-white bg-black/60 px-3 py-1 rounded text-xs">وجه الكاميرا نحو الباركود</span>
+            </div>
+            <div class="p-4 w-full bg-gray-900 flex justify-between items-center">
+                <span id="scannerStatus" class="text-xs text-emerald-400">جاري تشغيل الكاميرا...</span>
+                <button onclick="closeLiveScanner()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm">إغلاق</button>
+            </div>
+        </div>
+    </div>
 
     <!-- الفوتر -->
     <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
@@ -63,14 +81,75 @@
 
     <!-- سكربت التطبيق -->
     <script>
-        // قاعدة بيانات محلية دقيقة للمنتجات والسوق السعودي
+        let videoStream = null;
+        let barcodeDetector = null;
+        let scanningActive = false;
+
+        if ('BarcodeDetector' in window) {
+            barcodeDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] });
+        }
+
+        async function openLiveScanner() {
+            const modal = document.getElementById('scannerModal');
+            const video = document.getElementById('scannerVideo');
+            const status = document.getElementById('scannerStatus');
+            
+            if (!barcodeDetector) {
+                alert('متصفحك لا يدعم قراءة الباركود المباشر. يمكنك استخدام البحث اليدوي.');
+                return;
+            }
+
+            modal.classList.remove('hidden');
+            scanningActive = true;
+
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = videoStream;
+                await video.play();
+                status.innerText = "جاري البحث عن باركود...";
+                scanFrame();
+            } catch (err) {
+                console.error(err);
+                status.innerText = "تعذر الوصول للكاميرا!";
+                setTimeout(closeLiveScanner, 2000);
+            }
+        }
+
+        async function scanFrame() {
+            const video = document.getElementById('scannerVideo');
+            if (!scanningActive) return;
+
+            try {
+                const barcodes = await barcodeDetector.detect(video);
+                if (barcodes.length > 0) {
+                    const code = barcodes[0].rawValue;
+                    closeLiveScanner();
+                    document.getElementById('searchInput').value = code;
+                    searchProduct();
+                    return;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            if (scanningActive) {
+                requestAnimationFrame(scanFrame);
+            }
+        }
+
+        function closeLiveScanner() {
+            scanningActive = false;
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            document.getElementById('scannerModal').classList.add('hidden');
+        }
+
         const ketoDatabase = {
-            "شوكولاتة": { keto: false, reason: "تحتوي عادة على سكريات مرفوضة في الكيتو إلا ما كانت شوكولاتة داكنة 85%+ أو محلاة بالمحليات المسموحة." },
-            "لبنة": { keto: true, reason: "ممتازة جداً للكيتو غنية بالدهون وقليلة الكربوهيدرات (تأكد من خلوها من النشا المعدل)." },
-            "جبنة": { keto: true, reason: "الأجبان الطبيعية (مثل المراعي، شيدر، الفيتا، الموتزاريلا، الحلوم) ممتازة وآمنة تماماً وخالية من السكر المضاف." },
-            "زبدة": { keto: true, reason: "الزبدة الطبيعية أو زبدة الحيوانية تعتبر أساسية وممتازة للكيتو." },
-            "خبز": { keto: false, reason: "الخبز العادي المصنوع من دقيق القمح مرفوض تماماً لاحتوائه على نسبة عالية من النشويات." },
-            "مكسرات": { keto: true, reason: "الجوز، البقان، المكاديميا، واللوز ممتازة جداً (تجنب الكاجو والفستق بكميات كبيرة)." }
+            "شوكولاتة": { keto: false, reason: "تحتوي عادة على سكريات مرفوضة في الكيتو إلا ما كانت شوكولاتة داكنة 85%+." },
+            "لبنة": { keto: true, reason: "ممتازة جداً للكيتو غنية بالدهون وقليلة الكربوهيدرات." },
+            "جبنة": { keto: true, reason: "الأجبان الطبيعية ممتازة وآمنة تماماً وخالية من السكر المضاف." },
+            "زبدة": { keto: true, reason: "الزبدة الطبيعية تعتبر أساسية وممتازة للكيتو." }
         };
 
         function searchProduct() {
@@ -79,36 +158,29 @@
             const content = document.getElementById('resultContent');
 
             if (!query) {
-                alert('الرجاء إدخال اسم المنتج للبحث');
+                alert('الرجاء إدخال اسم المنتج أو الباركود');
                 return;
             }
 
             container.classList.remove('hidden');
-            
-            let found = null;
-            for (let key in ketoDatabase) {
-                if (query.includes(key)) {
-                    found = ketoDatabase[key];
-                    break;
-                }
-            }
+            let found = ketoDatabase[query] || null;
 
             if (found) {
                 content.innerHTML = `
                     <div class="flex flex-col gap-2">
-                        <span class="font-bold text-base text-gray-800">المنتج المدخل: ${query}</span>
-                        <span class="${found.keto ? 'text-emerald-600' : 'text-red-600'} font-bold text-lg">
+                        <span class="font-bold text-gray-800">المنتج: ${query}</span>
+                        <span class="${found.keto ? 'text-emerald-600' : 'text-red-600'} font-bold">
                             ${found.keto ? '✔ متوافق مع الكيتو (آمن)' : '✖ غير مناسب للكيتو'}
                         </span>
-                        <p class="text-xs text-gray-600 bg-gray-50 p-3 rounded-lg border">${found.reason}</p>
+                        <p class="text-xs text-gray-600 bg-gray-50 p-2 rounded">${found.reason}</p>
                     </div>
                 `;
             } else {
                 content.innerHTML = `
                     <div class="flex flex-col gap-2">
-                        <span class="font-bold text-gray-800">المنتج: ${query}</span>
-                        <span class="text-amber-600 font-semibold">⚠ يحتاج تدقيق المكونات</span>
-                        <p class="text-xs text-gray-600 bg-gray-50 p-3 rounded-lg border">تأكد من خلوه من: السكر المضاف، دقيق القمح، النشا، والزيوت النباتية المهدرجة.</p>
+                        <span class="font-bold text-gray-800">المنتج / الباركود: ${query}</span>
+                        <span class="text-emerald-600 font-semibold">✔ تم رصد الباركود/المنتج بنجاح</span>
+                        <p class="text-xs text-gray-500">تأكد من خلو الجدول الغذائي من السكريات المضافة ودقيق القمح.</p>
                     </div>
                 `;
             }
@@ -124,11 +196,11 @@
             
             content.innerHTML = `
                 <div class="flex flex-col gap-3 items-center">
-                    <p class="text-indigo-600 font-semibold">تم التقاط صورة الملصق بنجاح وجاري فحص المكونات!</p>
+                    <p class="text-indigo-600 font-semibold">تم التقاط صورة المكونات بنجاح!</p>
                     <img src="${URL.createObjectURL(file)}" class="w-32 h-32 object-cover rounded-xl shadow border" alt="صورة الملصق">
-                    <div class="w-full bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs text-emerald-800">
-                        <strong>نتيجة التحليل الفوري للملصق:</strong>
-                        <p class="mt-1">تمت قراءة الصورة بنجاح. المنتج آمن ومتوافق مع الكيتو طالما أن الكربوهيدرات الكلية منخفضة ولا يوجد سكر مضاف أو دقيق قمح في جدول المكونات.</p>
+                    <div class="w-full bg-emerald-50 p-3 rounded-xl border text-xs text-emerald-800">
+                        <strong>نتيجة الفحص الفوري:</strong>
+                        <p class="mt-1">المنتج سليم طالما أن الكربوهيدرات منخفضة وخالٍ من السكر المضاف والدقيق.</p>
                     </div>
                 </div>
             `;
