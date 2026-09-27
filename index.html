@@ -3,186 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فاحص منتجات الكيتو - السعودية (النسخة الصارمة الدقيقة)</title>
+    <title>فاحص الكيتو الذكي والصارم - السعودية</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        ketoPrimary: '#0f766e',
+                        ketoDark: '#134e4a',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
 
-    <!-- الهيدر -->
-    <header class="bg-teal-800 text-white shadow-md py-4 px-6 flex justify-between items-center">
-        <div class="flex items-center space-x-3 space-x-reverse">
-            <i class="fa-solid fa-shield-halved text-2xl text-teal-300"></i>
-            <h1 class="text-xl font-bold">كيتو سكنر - النسخة الصارمة الموثوقة</h1>
-        </div>
-        <span class="text-xs bg-teal-900 px-3 py-1 rounded-full text-teal-200">دقة 100% بدون أخطاء</span>
-    </header>
-
-    <!-- المحتوى الرئيسي -->
-    <main class="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col gap-6">
-
-        <!-- بطاقة البحث -->
-        <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 flex flex-col gap-4">
-            <h2 class="text-base font-bold text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-magnifying-glass text-teal-700"></i> ابحث عن أي منتج أو أدخل الباركود للتأكد من ملاءمته:
-            </h2>
-            
-            <div class="relative flex items-center">
-                <input type="text" id="searchInput" placeholder="اكتب اسم المنتج (مثل: لبنة، زبدة، حليب، شوكولاتة)..." class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-600 transition" oninput="searchProduct()">
-                <button onclick="searchProduct()" class="absolute left-2 bg-teal-700 text-white px-4 py-2.5 rounded-xl hover:bg-teal-800 transition">
-                    <i class="fa-solid fa-search"></i>
-                </button>
+    <header class="bg-gradient-to-r from-ketoDark to-ketoPrimary text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-ketoPrimary p-2.5 rounded-2xl shadow-md text-xl font-bold">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-wide">فاحص الكيتو الصارم (بالذكاء الاصطناعي)</h1>
+                    <p class="text-xs text-teal-100 opacity-90">يقرأ الجدول الغذائي والمكونات بدقة لمنتجات السوق السعودي</p>
+                </div>
             </div>
         </div>
+    </header>
 
-        <!-- منطقة عرض النتائج -->
-        <div id="resultContainer" class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 hidden transition-all">
-            <div id="resultCardContent"></div>
+    <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-grow space-y-6">
+
+        <!-- بطاقة رفع الصورة -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 space-y-4">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-camera text-ketoPrimary"></i> تصور خلف العبوة (جدول الحقائق التغذوية والمكونات)
+            </h2>
+            
+            <p class="text-xs text-slate-600 leading-relaxed">
+                لكي نحسم أمر أي منتج (مثل اللبنة، الجبنة، الكريمة وغيرها)، قم بتصوير جدول الحقائق التغذوية وقائمة المكونات بوضوح. سيقوم النظام بتطبيق قواعد الكيتو الصارمة (فحص الكربوهيدرات، السكريات المضافة، والنشا المعدل).
+            </p>
+
+            <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-2xl p-6 bg-slate-50 hover:bg-teal-50/40 transition cursor-pointer relative" onclick="document.getElementById('aiImageInput').click()">
+                <div id="uploadPlaceholder" class="space-y-2 text-center">
+                    <div class="w-12 h-12 bg-teal-100 text-ketoPrimary rounded-full flex items-center justify-center mx-auto text-xl">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm font-bold text-slate-700 block">اضغط هنا لاختيار أو التقاط صورة الملصق</span>
+                </div>
+                <img id="imagePreview" class="max-h-48 rounded-xl hidden object-contain shadow-md" alt="معاينة الصورة">
+                <input type="file" id="aiImageInput" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
+            </div>
+
+            <div id="aiLoading" class="hidden text-center py-4 space-y-2">
+                <div class="inline-block w-8 h-8 border-4 border-ketoPrimary border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-xs font-bold text-ketoPrimary">جاري قراءة الجدول الغذائي وتطبيق معايير الكيتو الصارمة...</p>
+            </div>
+
+            <button id="analyzeAiBtn" onclick="analyzeStrictKeto()" disabled class="w-full bg-ketoPrimary hover:bg-ketoDark disabled:opacity-50 text-white font-bold py-3.5 rounded-2xl transition shadow-md flex items-center justify-center gap-2 text-sm">
+                <i class="fa-solid fa-brain"></i> ابدأ التحليل الصارم للمنتج
+            </button>
         </div>
 
-        <!-- قائمة المنتجات المعتمدة في القاعدة المحلية -->
-        <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 space-y-3">
-            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <i class="fa-solid fa-database text-teal-700"></i> عينة من منتجات القاعدة الصارمة:
-            </h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100">🥛 لبنة المراعي / الصافي: <strong class="text-teal-700">مسموح</strong></div>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100">🧈 زبدة لورباك / المراعي: <strong class="text-teal-700">مسموح ممتاز</strong></div>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100">🍼 حليب أطفال / عصيرات: <strong class="text-red-600">ممنوع تماماً (عالي السكر)</strong></div>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100">🍞 الخبز الأبيض وعموم الدقيق: <strong class="text-red-600">ممنوع تماماً</strong></div>
+        <!-- منطقة عرض النتيجة -->
+        <div id="resultContainer" class="hidden">
+            <div id="resultCard" class="rounded-3xl p-6 shadow-xl border space-y-4 transition-all">
+                <div class="flex items-center justify-between border-b pb-4 border-slate-200/60">
+                    <div class="flex items-center gap-3">
+                        <div id="resultIcon" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm text-white"></div>
+                        <div>
+                            <h3 id="resultTitle" class="text-lg font-black text-slate-900"></h3>
+                            <p id="resultSubtitle" class="text-xs font-semibold text-slate-500"></p>
+                        </div>
+                    </div>
+                    <span id="resultBadge" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider"></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/60">
+                        <span class="block text-xs text-slate-500 font-medium">صافي الكربوهيدرات (لكل حصة/100جم)</span>
+                        <span id="netCarbsVal" class="text-base font-black text-slate-800">-</span>
+                    </div>
+                    <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/60">
+                        <span class="block text-xs text-slate-500 font-medium">السكريات المضافة والمكونات</span>
+                        <span id="fatsVal" class="text-base font-black text-slate-800">-</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-stethoscope text-ketoPrimary"></i> التقرير الفني الصارم:
+                    </h4>
+                    <p id="resultDescription" class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-white/70 p-4 rounded-2xl border border-slate-200/60"></p>
+                </div>
             </div>
         </div>
 
     </main>
 
-    <!-- الفوتر -->
     <footer class="bg-white border-t py-4 text-center text-xs text-slate-400">
-        جميع الحقوق محفوظة - كيتو سكنر السعودية 2026 (قاعدة بيانات صارمة)
+        جميع الحقوق محفوظة - كيتو سكنر السعودية 2026 (النسخة الذكية الصارمة)
     </footer>
 
-    <!-- سكربت القاعدة الصارمة -->
+    <!-- سكربت الفحص الذكي الصارم -->
     <script>
-        // قاعدة بيانات صارمة ومعتمدة يدوياً لمنع أي تلاعب أو خطأ
-        const strictDatabase = [
-            {
-                keywords: ["لبنة", "لبنه"],
-                name: "اللبنة الطازجة (المراعي / نادك / الصافي)",
-                status: true,
-                badge: "مسموح (متوافق مع الكيتو)",
-                badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                cardBg: "bg-emerald-50/70 border-emerald-200",
-                reason: "اللبنة الطبيعية غنية بالدهون وقليلة الكربوهيدرات (تأكد دائماً من خلوها من النشا المعدل في المكونات)."
-            },
-            {
-                keywords: ["زبدة", "لورباك"],
-                name: "الزبدة الطبيعية (لورباك، المراعي، نيوزلندي)",
-                status: true,
-                badge: "مسموح ممتاز (أساسي للكيتو)",
-                badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                cardBg: "bg-emerald-50/70 border-emerald-200",
-                reason: "خالية تماماً من الكربوهيدرات والسكريات، وتعتبر مصدراً ممتازاً للدهون الصحية النظيفة."
-            },
-            {
-                keywords: ["جبنة", "جبن", "مرعي", "موتزاريلا", "شيدر", "حلوم"],
-                name: "الأجبان الطبيعية (شيدر، موتزاريلا، حلوم، فيتا)",
-                status: true,
-                badge: "مسموح (آمن تماماً)",
-                badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                cardBg: "bg-emerald-50/70 border-emerald-200",
-                reason: "الأجبان الطبيعية الصلبة والبيضاء ممتازة للكيتو لخلوها من السكر المضاف وارتفاع دهونها."
-            },
-            {
-                keywords: ["حليب أطفال", "حليب بودرة", "سيملاك", "أطفال"],
-                name: "حليب الأطفال المجفف أو المنتجات المغذية للرضع",
-                status: false,
-                badge: "ممنوع تماماً (صدمة سكر)",
-                badgeClass: "bg-red-100 text-red-800 border-red-200",
-                cardBg: "bg-red-50/70 border-red-200",
-                reason: "تحتوي على سكريات وكربوهيدرات عالية جداً (أكثر من 16 جم لكل حصة)، وترفع الأنسولين بقوة وتخرجك فوراً من الكيتو."
-            },
-            {
-                keywords: ["حليب سائل", "حليب المراعي", "حليب السعودية", "حليب كامل الدسم"],
-                name: "الحليب الحيواني السائل (كامل أو طازج)",
-                status: false,
-                badge: "ممنوع (يحتوي على اللاكتوز)",
-                badgeClass: "bg-red-100 text-red-800 border-red-200",
-                cardBg: "bg-red-50/70 border-red-200",
-                reason: "يحتوي الحليب الطبيعي على سكر اللاكتوز (حوالي 5 جرام سكر لكل 100 مل)، وهو غير مسموح بكميات حرة في الكيتو."
-            },
-            {
-                keywords: ["خبز", "صامولي", "تست", "دقيق", "قمح"],
-                name: "الخبز العادي ومخبوزات القمح والنشويات",
-                status: false,
-                badge: "ممنوع تماماً",
-                badgeClass: "bg-red-100 text-red-800 border-red-200",
-                cardBg: "bg-red-50/70 border-red-200",
-                reason: "مليء بالدقيق والنشويات والجلوبين، ويدمر الحالة الكيتونية تماماً."
-            },
-            {
-                keywords: ["شوكولاتة", "شوكلاته", "جالكسي", "سناكس"],
-                name: "الشوكولاتة العادية التجارية",
-                status: false,
-                badge: "ممنوع (تحتوي على سكر مضاف)",
-                badgeClass: "bg-red-100 text-red-800 border-red-200",
-                cardBg: "bg-red-50/70 border-red-200",
-                reason: "الشوكولاتة العادية ممتلئة بالسكروز والسكر الأبيض. المسموح حصراً هو الشوكولاتة الداكنة 85%+ أو المحلاة بستيفيا/إريثريتول."
-            }
-        ];
+        let selectedBase64Image = null;
 
-        function searchProduct() {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            const container = document.getElementById('resultContainer');
-            const cardContent = document.getElementById('resultCardContent');
+        function handleImageSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedBase64Image = e.target.result.split(',')[1];
+                const preview = document.getElementById('imagePreview');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                document.getElementById('uploadPlaceholder').classList.add('hidden');
+                document.getElementById('analyzeAiBtn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
 
-            if (!query) {
-                container.classList.add('hidden');
-                return;
-            }
+        async function analyzeStrictKeto() {
+            if (!selectedBase64Image) return;
 
-            container.classList.remove('hidden');
+            document.getElementById('aiLoading').classList.remove('hidden');
+            document.getElementById('analyzeAiBtn').disabled = true;
+            document.getElementById('resultContainer').classList.add('hidden');
 
-            // البحث الذكي المطابق للكلمات المفتاحية
-            let matchedProduct = null;
-            for (let item of strictDatabase) {
-                for (let keyword of item.keywords) {
-                    if (query.includes(keyword)) {
-                        matchedProduct = item;
-                        break;
+            const systemPrompt = `You are an extremely strict, expert Keto nutritionist in Saudi Arabia. 
+Analyze the provided image of the nutrition facts table and ingredients list. 
+Apply strict Keto rules: 
+1. If total carbohydrates per serving or 100g are high (> 5g generally, or if sugars/starches/modified starch/wheat flour are present), classify it as forbidden ("forbidden").
+2. Check for hidden sugars, milk powders, lactose, or thickeners.
+Return a clean JSON response with fields:
+- name: string (inferred product name)
+- category: string ("فحص دقيق بالذكاء الاصطناعي")
+- status: "allowed" (if truly keto safe), "warning" (moderate/use with caution), or "forbidden" (if high carbs/sugar/starch)
+- badge: string (e.g. "مسموح ممتاز", "ممنوع (عالي الكربوهيدرات/النشا)")
+- netCarbs: string (e.g. "2 جم")
+- fats: string (e.g. "خالٍ من النشا والسكر")
+- marketVerdict: string ("تم التحليل بناءً على الأرقام الفعلية بالصورة")
+- description: string (detailed technical explanation in Arabic explaining why it passed or failed based on the numbers and ingredients shown).`;
+
+            const userQuery = "قم بقراءة الأرقام والمكونات في هذه الصورة بدقة وتحليلها وفق المعايير الصارمة للكيتو.";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=`;
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: userQuery },
+                        { inlineData: { mimeType: "image/jpeg", data: selectedBase64Image } }
+                    ]
+                }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            name: { type: "STRING" },
+                            category: { type: "STRING" },
+                            status: { type: "STRING" },
+                            badge: { type: "STRING" },
+                            netCarbs: { type: "STRING" },
+                            fats: { type: "STRING" },
+                            marketVerdict: { type: "STRING" },
+                            description: { type: "STRING" }
+                        },
+                        propertyOrdering: ["name", "category", "status", "badge", "netCarbs", "fats", "marketVerdict", "description"]
                     }
                 }
-                if (matchedProduct) break;
-            }
+            };
 
-            if (matchedProduct) {
-                cardContent.innerHTML = `
-                    <div class="p-6 rounded-2xl border ${matchedProduct.cardBg} space-y-3">
-                        <div class="flex items-center justify-between border-b pb-3 border-slate-200/60">
-                            <span class="font-black text-slate-900 text-base">${matchedProduct.name}</span>
-                            <span class="px-3 py-1 rounded-xl text-xs font-bold border ${matchedProduct.badgeClass}">${matchedProduct.badge}</span>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-white/80 p-3 rounded-xl border border-slate-200/50">
-                            <strong>التحليل الصارم:</strong> ${matchedProduct.reason}
-                        </p>
-                    </div>
-                `;
-            } else {
-                cardContent.innerHTML = `
-                    <div class="p-6 rounded-2xl border bg-amber-50/70 border-amber-200 space-y-3">
-                        <div class="flex items-center justify-between border-b pb-3 border-amber-200/60">
-                            <span class="font-black text-slate-900 text-base">المنتج: "${query}"</span>
-                            <span class="px-3 py-1 rounded-xl text-xs font-bold border bg-amber-100 text-amber-900 border-amber-200">⚠ يحتاج فحص المكونات يدوياً</span>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-white/80 p-3 rounded-xl border border-amber-200/50">
-                            <strong>توجيه صارم:</strong> هذا المنتج غير مسجل في القاعدة المباشرة. افتح جدول الحقائق التغذوية وتأكد من أن <strong>الكربوهيدرات الكلية أقل من 5 جم</strong>، وأن <strong>السكريات المضافة 0 جم</strong>، وخالٍ تماماً من الدقيق والنشا.
-                        </p>
-                    </div>
-                `;
+            try {
+                let response = null;
+                for (let i = 0; i < 3; i++) {
+                    try {
+                        const res = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (res.ok) {
+                            response = await res.json();
+                            break;
+                        }
+                    } catch (err) {
+                        await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                    }
+                }
+
+                document.getElementById('aiLoading').classList.add('hidden');
+                document.getElementById('analyzeAiBtn').disabled = false;
+
+                if (response && response.candidates && response.candidates[0].content.parts[0].text) {
+                    const aiResult = JSON.parse(response.candidates[0].content.parts[0].text);
+                    showResultCard(aiResult);
+                } else {
+                    throw new Error("Invalid AI response");
+                }
+            } catch (e) {
+                document.getElementById('aiLoading').classList.add('hidden');
+                document.getElementById('analyzeAiBtn').disabled = false;
+                alert("حدث خطأ أثناء الاتصال بنظام التحليل. يرجى المحاولة مرة أخرى.");
             }
+        }
+
+        function showResultCard(item) {
+            const container = document.getElementById('resultContainer');
+            const card = document.getElementById('resultCard');
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const subtitle = document.getElementById('resultSubtitle');
+            const badge = document.getElementById('resultBadge');
+            const netCarbsVal = document.getElementById('netCarbsVal');
+            const fatsVal = document.getElementById('fatsVal');
+            const marketVerdictVal = document.getElementById('marketVerdictVal');
+            const description = document.getElementById('resultDescription');
+
+            container.classList.remove('hidden');
+            title.textContent = item.name || "منتج محلل";
+            subtitle.textContent = `التصنيف: ${item.category || 'فحص بصري'}`;
+            netCarbsVal.textContent = item.netCarbs || 'غير محدد';
+            fatsVal.textContent = item.fats || 'غير محددة';
+            description.textContent = item.description || 'لا توجد تفاصيل إضافية.';
+
+            if (item.status === 'allowed') {
+                card.className = "rounded-3xl p-6 shadow-xl border bg-emerald-50/80 border-emerald-200 space-y-4";
+                icon.className = "w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm bg-emerald-600 text-white";
+                icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                badge.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-200 text-emerald-900";
+            } else if (item.status === 'warning') {
+                card.className = "rounded-3xl p-6 shadow-xl border bg-amber-50/80 border-amber-200 space-y-4";
+                icon.className = "w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm bg-amber-500 text-white";
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                badge.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-200 text-amber-900";
+            } else {
+                card.className = "rounded-3xl p-6 shadow-xl border bg-red-50/80 border-red-200 space-y-4";
+                icon.className = "w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm bg-red-600 text-white";
+                icon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                badge.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-red-200 text-red-900";
+            }
+            badge.textContent = item.badge || "نتيجة الفحص";
+            container.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
